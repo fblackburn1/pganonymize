@@ -20,3 +20,7 @@ class ProviderAlreadyRegistered(PgAnonymizeException):
 
 class BadDataFormat(PgAnonymizeException):
     """Raised if the anonymized data cannot be copied."""
+
+
+class InvalidConfiguration(PgAnonymizeException):
+    """Raised if configuration is invalid."""

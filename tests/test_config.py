@@ -1,9 +1,10 @@
 import os
 
 import pytest
-from mock import patch
+from mock import patch, Mock
 
-from pganonymize.config import load_schema
+from pganonymize.config import load_schema, validate_args_with_config
+from pganonymize.exceptions import InvalidConfiguration
 
 
 @pytest.mark.parametrize('file, envs, expected', [
@@ -59,3 +60,38 @@ from pganonymize.config import load_schema
 def test_load_schema(file, envs, expected):
     with patch.dict(os.environ, envs):
         assert load_schema(file) == expected
+
+
+def test_validate_args_with_config_when_valid():
+    args = Mock(parallel=False)
+    schema = {
+        'tables': [
+            {
+                'table_name': {
+                    'fields': [
+                        {'column_name': {'provider': {'name': 'fake.unique.pystr'}}}
+                    ]
+                }
+            }
+        ]
+    }
+    config = Mock(schema=schema)
+    validate_args_with_config(args, config)
+
+
+def test_validate_args_with_config_when_invalid():
+    args = Mock(parallel=True)
+    schema = {
+        'tables': [
+            {
+                'table_name': {
+                    'fields': [
+                        {'column_name': {'provider': {'name': 'fake.unique.pystr'}}}
+                    ]
+                }
+            }
+        ]
+    }
+    config = Mock(schema=schema)
+    with pytest.raises(InvalidConfiguration):
+        validate_args_with_config(args, config)

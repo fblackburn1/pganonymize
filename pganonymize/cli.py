@@ -6,7 +6,7 @@ import argparse
 import logging
 import time
 
-from pganonymize.config import config
+from pganonymize.config import config, validate_args_with_config
 from pganonymize.constants import DATABASE_ARGS, DEFAULT_SCHEMA_FILE
 from pganonymize.providers import provider_registry
 from pganonymize.utils import anonymize_tables, create_database_dump, get_connection, truncate_tables
@@ -70,6 +70,8 @@ def main(args):
         return 0
 
     config.schema_file = args.schema
+
+    validate_args_with_config(args, config)
 
     pg_args = get_pg_args(args)
     connection = get_connection(pg_args)

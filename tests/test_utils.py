@@ -236,12 +236,22 @@ class TestCreateDatabaseDump(object):
 
     @patch('pganonymize.utils.subprocess.call')
     def test(self, mock_call):
-        create_database_dump('/tmp/dump.gz', {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432})
-        mock_call.assert_called_once_with('pg_dump -Fc -Z 9 -d database -U foo -h localhost -p 5432 -f /tmp/dump.gz',
-                                          shell=True)
+        create_database_dump(
+            '/tmp/dump.gz',
+            {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432},
+        )
+        mock_call.assert_called_once_with(
+            'pg_dump -Fc -Z 9 -d database -U foo -h localhost -p 5432 -f /tmp/dump.gz',
+            shell=True,
+        )
 
     @patch('pganonymize.utils.subprocess.call')
     def test_with_password(self, mock_call):
-        create_database_dump('/tmp/dump.gz', {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432, 'password': 'pass'})
-        mock_call.assert_called_once_with('PGPASSWORD=pass pg_dump -Fc -Z 9 -d database -U foo -h localhost -p 5432 -f /tmp/dump.gz',
-                                          shell=True)
+        create_database_dump(
+            '/tmp/dump.gz',
+            {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432, 'password': 'pass'},
+        )
+        mock_call.assert_called_once_with(
+            'PGPASSWORD=pass pg_dump -Fc -Z 9 -d database -U foo -h localhost -p 5432 -f /tmp/dump.gz',
+            shell=True,
+        )

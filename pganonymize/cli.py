@@ -50,7 +50,10 @@ def get_arg_parser():
     parser.add_argument(
         '--parallel',
         action='store_true',
-        help='Parallelize anonymization of value. WARNING: `fake.unique.*` providers are not compatible with this option',
+        help=(
+            'Parallelize anonymization of value.'
+            'WARNING: `fake.unique.*` providers are not compatible with this option'
+        ),
         default=False,
     )
 

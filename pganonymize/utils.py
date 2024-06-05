@@ -24,13 +24,14 @@ from pganonymize.providers import provider_registry
 psycopg2.extras.register_uuid()
 
 
-def anonymize_tables(connection, verbose=False, dry_run=False):
+def anonymize_tables(connection, verbose=False, dry_run=False, parallel=False):
     """
     Anonymize a list of tables according to the schema definition.
 
     :param connection: A database connection instance.
     :param bool verbose: Display logging information and a progress bar.
     :param bool dry_run: Script is running in dry-run mode, no commit expected.
+    :param bool parallel: Data anonymization is done in parallel.
     """
     definitions = config.schema.get('tables', [])
     for definition in definitions:
@@ -44,8 +45,19 @@ def anonymize_tables(connection, verbose=False, dry_run=False):
         primary_key = table_definition.get('primary_key', DEFAULT_PRIMARY_KEY)
         total_count = get_table_count(connection, table_name, dry_run)
         chunk_size = table_definition.get('chunk_size', DEFAULT_CHUNK_SIZE)
-        build_and_then_import_data(connection, table_name, primary_key, columns, excludes,
-                                   search, total_count, chunk_size, verbose=verbose, dry_run=dry_run)
+        build_and_then_import_data(
+            connection,
+            table_name,
+            primary_key,
+            columns,
+            excludes,
+            search,
+            total_count,
+            chunk_size,
+            verbose=verbose,
+            dry_run=dry_run,
+            parallel=parallel,
+        )
         end_time = time.time()
         logging.info('{} anonymization took {:.2f}s'.format(table_name, end_time - start_time))
 
@@ -63,8 +75,19 @@ def process_row(row, columns, excludes):
         return row
 
 
-def build_and_then_import_data(connection, table, primary_key, columns,
-                               excludes, search, total_count, chunk_size, verbose=False, dry_run=False):
+def build_and_then_import_data(
+    connection,
+    table,
+    primary_key,
+    columns,
+    excludes,
+    search,
+    total_count,
+    chunk_size,
+    verbose=False,
+    dry_run=False,
+    parallel=False,
+):
     """
     Select all data from a table and return it together with a list of table columns.
 
@@ -78,6 +101,7 @@ def build_and_then_import_data(connection, table, primary_key, columns,
     :param int chunk_size: Number of data rows to fetch with the cursor
     :param bool verbose: Display logging information and a progress bar.
     :param bool dry_run: Script is running in dry-run mode, no commit expected.
+    :param bool parallel: Data anonymization is done in parallel.
     """
     column_names = get_column_names(columns)
     sql_columns = SQL(', ').join([Identifier(column_name) for column_name in [primary_key] + column_names])
@@ -95,7 +119,7 @@ def build_and_then_import_data(connection, table, primary_key, columns,
     for i in trange(batches, desc="Processing {} batches for {}".format(batches, table), disable=not verbose):
         records = cursor.fetchmany(size=chunk_size)
         if records:
-            data = parmap.map(process_row, records, columns, excludes, pm_pbar=verbose)
+            data = parmap.map(process_row, records, columns, excludes, pm_pbar=verbose, pm_parallel=parallel)
             import_data(connection, temp_table, [primary_key] + column_names, filter(None, data))
     apply_anonymized_data(connection, temp_table, table, primary_key, columns)
 

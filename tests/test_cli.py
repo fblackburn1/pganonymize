@@ -17,7 +17,7 @@ class TestCli(object):
     @pytest.mark.parametrize('cli_args, expected, expected_executes, commit_calls, call_dump', [
         ['--host localhost --port 5432 --user root --password my-cool-password --dbname db --schema ./tests/schemes/valid_schema.yml -v --init-sql "set work_mem=\'1GB\'"',  # noqa
          Namespace(verbose=1, list_providers=False, schema='./tests/schemes/valid_schema.yml', dbname='db', user='root',
-                   password='my-cool-password', host='localhost', port='5432', dry_run=False, dump_file=None, init_sql="set work_mem='1GB'"),  # noqa
+                   password='my-cool-password', host='localhost', port='5432', dry_run=False, dump_file=None, init_sql="set work_mem='1GB'", parallel=False),  # noqa
          [call("set work_mem='1GB'"),
           call('TRUNCATE TABLE "django_session"'),
           call('SELECT COUNT(*) FROM "auth_user"'),
@@ -32,7 +32,7 @@ class TestCli(object):
          ],
         ['--dry-run --host localhost --port 5432 --user root --password my-cool-password --dbname db --schema ./tests/schemes/valid_schema.yml -v --init-sql "set work_mem=\'1GB\'"',  # noqa
          Namespace(verbose=1, list_providers=False, schema='./tests/schemes/valid_schema.yml', dbname='db', user='root',
-                   password='my-cool-password', host='localhost', port='5432', dry_run=True, dump_file=None, init_sql="set work_mem='1GB'"),  # noqa
+                   password='my-cool-password', host='localhost', port='5432', dry_run=True, dump_file=None, init_sql="set work_mem='1GB'", parallel=False),  # noqa
          [call("set work_mem='1GB'"),
           call('TRUNCATE TABLE "django_session"'),
              call('SELECT "id", "first_name", "last_name", "email" FROM "auth_user" LIMIT 100'),
@@ -44,7 +44,7 @@ class TestCli(object):
          ],
         ['--dump-file ./dump.sql --host localhost --port 5432 --user root --password my-cool-password --dbname db --schema ./tests/schemes/valid_schema.yml -v --init-sql "set work_mem=\'1GB\'"',  # noqa
          Namespace(verbose=1, list_providers=False, schema='./tests/schemes/valid_schema.yml', dbname='db', user='root',
-                   password='my-cool-password', host='localhost', port='5432', dry_run=False, dump_file='./dump.sql', init_sql="set work_mem='1GB'"),  # noqa
+                   password='my-cool-password', host='localhost', port='5432', dry_run=False, dump_file='./dump.sql', init_sql="set work_mem='1GB'", parallel=False),  # noqa
          [
              call("set work_mem='1GB'"),
              call('TRUNCATE TABLE "django_session"'),
@@ -59,9 +59,9 @@ class TestCli(object):
          [call('PGPASSWORD=my-cool-password pg_dump -Fc -Z 9 -d db -U root -h localhost -p 5432 -f ./dump.sql', shell=True)]
          ],
 
-        ['--list-providers',
+        ['--list-providers --parallel',
          Namespace(verbose=None, list_providers=True, schema='schema.yml', dbname=None, user=None,
-                   password='', host='localhost', port='5432', dry_run=False, dump_file=None, init_sql=False),
+                   password='', host='localhost', port='5432', dry_run=False, dump_file=None, init_sql=False, parallel=True),
          [], 0, []
          ]
     ])

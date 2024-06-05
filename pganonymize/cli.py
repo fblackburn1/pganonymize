@@ -47,6 +47,12 @@ def get_arg_parser():
                         default=False)
     parser.add_argument('--dump-file', help='Create a database dump file with the given name')
     parser.add_argument('--init-sql', help='SQL to run before starting anonymization', default=False)
+    parser.add_argument(
+        '--parallel',
+        action='store_true',
+        help='Parallelize anonymization of value. WARNING: `fake.unique.*` providers are not compatible with this option',
+        default=False,
+    )
 
     return parser
 
@@ -75,7 +81,12 @@ def main(args):
 
     start_time = time.time()
     truncate_tables(connection)
-    anonymize_tables(connection, verbose=args.verbose, dry_run=args.dry_run)
+    anonymize_tables(
+        connection,
+        verbose=args.verbose,
+        dry_run=args.dry_run,
+        parallel=args.parallel,
+    )
 
     if not args.dry_run:
         connection.commit()

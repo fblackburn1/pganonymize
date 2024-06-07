@@ -56,7 +56,7 @@ class TestCli(object):
              call('UPDATE "auth_user" t SET "first_name" = s."first_name", "last_name" = s."last_name", "email" = s."email" FROM "tmp_auth_user" s WHERE t."id" = s."id"')  # noqa
          ],
          1,
-         [call('PGPASSWORD=my-cool-password pg_dump -Fc -Z 9 -d db -U root -h localhost -p 5432 -f ./dump.sql', shell=True)]  # noqa
+         [call('PGPASSWORD=my-cool-password pg_dump --format custom --compress 9 --dbname db --username root --host localhost --port 5432 --file ./dump.sql', shell=True)]  # noqa
          ],
 
         ['--list-providers --parallel',

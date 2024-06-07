@@ -241,7 +241,7 @@ class TestCreateDatabaseDump(object):
             {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432},
         )
         mock_call.assert_called_once_with(
-            'pg_dump -Fc -Z 9 -d database -U foo -h localhost -p 5432 -f /tmp/dump.gz',
+            'pg_dump --format custom --compress 9 --dbname database --username foo --host localhost --port 5432 --file /tmp/dump.gz',
             shell=True,
         )
 
@@ -252,6 +252,6 @@ class TestCreateDatabaseDump(object):
             {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432, 'password': 'pass'},
         )
         mock_call.assert_called_once_with(
-            'PGPASSWORD=pass pg_dump -Fc -Z 9 -d database -U foo -h localhost -p 5432 -f /tmp/dump.gz',
+            'PGPASSWORD=pass pg_dump --format custom --compress 9 --dbname database --username foo --host localhost --port 5432 --file /tmp/dump.gz',
             shell=True,
         )

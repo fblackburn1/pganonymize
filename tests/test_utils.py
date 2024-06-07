@@ -236,22 +236,33 @@ class TestCreateDatabaseDump(object):
 
     @patch('pganonymize.utils.subprocess.call')
     def test(self, mock_call):
-        create_database_dump(
-            '/tmp/dump.gz',
-            {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432},
-        )
+        filename = '/tmp/dump.gz'
+        db_args = {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432}
+        dump_args = '--format custom --compress 9'
+        create_database_dump(filename, db_args, dump_args)
         mock_call.assert_called_once_with(
-            'pg_dump --format custom --compress 9 --dbname database --username foo --host localhost --port 5432 --file /tmp/dump.gz',
+            'pg_dump --format custom --compress 9 --dbname database --username foo --host localhost --port 5432 --file /tmp/dump.gz',  # noqa
             shell=True,
         )
 
     @patch('pganonymize.utils.subprocess.call')
     def test_with_password(self, mock_call):
-        create_database_dump(
-            '/tmp/dump.gz',
-            {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432, 'password': 'pass'},
-        )
+        filename = '/tmp/dump.gz'
+        db_args = {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432, 'password': 'pass'}
+        dump_args = '--format custom --compress 9'
+        create_database_dump(filename, db_args, dump_args)
         mock_call.assert_called_once_with(
-            'PGPASSWORD=pass pg_dump --format custom --compress 9 --dbname database --username foo --host localhost --port 5432 --file /tmp/dump.gz',
+            'PGPASSWORD=pass pg_dump --format custom --compress 9 --dbname database --username foo --host localhost --port 5432 --file /tmp/dump.gz',  # noqa
+            shell=True,
+        )
+
+    @patch('pganonymize.utils.subprocess.call')
+    def test_with_custom_dump_args(self, mock_call):
+        filename = '/tmp/dump.gz'
+        db_args = {'dbname': 'database', 'user': 'foo', 'host': 'localhost', 'port': 5432}
+        dump_args = '--format plain'
+        create_database_dump(filename, db_args, dump_args)
+        mock_call.assert_called_once_with(
+            'pg_dump --format plain --dbname database --username foo --host localhost --port 5432 --file /tmp/dump.gz',  # noqa
             shell=True,
         )

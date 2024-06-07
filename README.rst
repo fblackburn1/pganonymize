@@ -85,7 +85,9 @@ Usage
     --port PORT           Port of the database
     --dry-run             Don't commit changes made on the database
     --dump-file DUMP_FILE
-                            Create a database dump file with the given name
+                          Create a database dump file with the given name
+    --dump-options DUMP_OPTIONS
+                          Options to pass to the pg_dump command
     --init-sql INIT_SQL   SQL to run before starting anonymization
     --parallel            Data anonymization is done in parallel
 

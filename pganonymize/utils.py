@@ -288,7 +288,7 @@ def truncate_tables(connection):
     cursor.close()
 
 
-def create_database_dump(filename, db_args):
+def create_database_dump(filename, db_args, dump_args):
     """
     Create a dump file from the current database.
 
@@ -299,10 +299,11 @@ def create_database_dump(filename, db_args):
     if db_args.get('password'):
         env_vars += 'PGPASSWORD={password}'.format(password=db_args['password'])
     arguments = '--dbname {dbname} --username {user} --host {host} --port {port}'.format(**db_args)
-    cmd = '{env_vars}pg_dump --format custom --compress 9 {args} --file {filename}'.format(
+    cmd = '{env_vars}pg_dump {dump_args} {db_args} --file {filename}'.format(
         env_vars='{} '.format(env_vars) if env_vars else '',
-        args=arguments,
-        filename=filename
+        dump_args=dump_args,
+        db_args=arguments,
+        filename=filename,
     )
     logging.info('Creating database dump file "%s"', filename)
     subprocess.call(cmd, shell=True)

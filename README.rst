@@ -135,6 +135,23 @@ Example call:
         --dump-file=/tmp/dump.gz \
         -v
 
+So that the password for dumping does not have to be entered manually, it can also be entered as an environment var
+``PGPASSWORD``:
+
+.. code-block::
+
+    $ PGPASSWORD=password pganonymize --schema=myschema.yml \
+        --dbname=test_database \
+        --user=username \
+        --password=mysecret \
+        --host=db.host.example.com \
+        --dump-file=/tmp/dump.gz \
+        -v
+
+.. warning::
+
+    Currently only the ``dump-file`` operation supports environment variables.
+
 Docker
 ~~~~~~
 

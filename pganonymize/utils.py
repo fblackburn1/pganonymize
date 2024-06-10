@@ -271,8 +271,12 @@ def create_database_dump(filename, db_args):
     :param str filename: Path to the dumpfile that should be created
     :param dict db_args: A dictionary with database related information
     """
+    env_vars = ''
+    if db_args.get('password'):
+        env_vars += 'PGPASSWORD={password}'.format(password=db_args['password'])
     arguments = '-d {dbname} -U {user} -h {host} -p {port}'.format(**db_args)
-    cmd = 'pg_dump -Fc -Z 9 {args} -f {filename}'.format(
+    cmd = '{env_vars}pg_dump -Fc -Z 9 {args} -f {filename}'.format(
+        env_vars='{} '.format(env_vars) if env_vars else '',
         args=arguments,
         filename=filename
     )

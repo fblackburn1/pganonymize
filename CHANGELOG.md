@@ -2,6 +2,7 @@
 
 ## Development
 
+* [#58 Support pg dump password](https://github.com/rheinwerk-verlag/pganonymize/pull/58) ([fblackburn1](https://github.com/fblackburn1))
 * [#53 Python 2.7 tests are failing](https://github.com/rheinwerk-verlag/pganonymize/issues/53)
 * [#56 Add Trusted Publisher Management workflow](https://github.com/rheinwerk-verlag/pganonymize/issues/56)
 

@@ -2,6 +2,7 @@ import os
 import re
 
 import yaml
+from pganonymize.exceptions import InvalidConfiguration
 
 
 class Config(object):
@@ -55,3 +56,14 @@ def load_schema(schema_file):
 
 
 config = Config()
+
+
+def validate_args_with_config(args, config):
+    definitions = config.schema.get('tables', [])
+    for definition in definitions:
+        table_definition = list(definition.values())[0]
+        columns = table_definition.get('fields', [])
+        for column in columns:
+            column_config = list(column.values())[0]
+            if args.parallel and column_config['provider']['name'].startswith('fake.unique'):
+                raise InvalidConfiguration('`--parallel` option and `fake.unique.*` providers are incompatible')

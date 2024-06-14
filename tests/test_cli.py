@@ -17,7 +17,7 @@ class TestCli(object):
     @pytest.mark.parametrize('cli_args, expected, expected_executes, commit_calls, call_dump', [
         ['--host localhost --port 5432 --user root --password my-cool-password --dbname db --schema ./tests/schemes/valid_schema.yml -v --init-sql "set work_mem=\'1GB\'"',  # noqa
          Namespace(verbose=1, list_providers=False, schema='./tests/schemes/valid_schema.yml', dbname='db', user='root',
-                   password='my-cool-password', host='localhost', port='5432', dry_run=False, dump_file=None, init_sql="set work_mem='1GB'", parallel=False),  # noqa
+                   password='my-cool-password', host='localhost', port='5432', dry_run=False, dump_file=None, dump_options='--format custom --compress 9', init_sql="set work_mem='1GB'", parallel=False),  # noqa
          [call("set work_mem='1GB'"),
           call('TRUNCATE TABLE "django_session"'),
           call('SELECT COUNT(*) FROM "auth_user"'),
@@ -32,7 +32,7 @@ class TestCli(object):
          ],
         ['--dry-run --host localhost --port 5432 --user root --password my-cool-password --dbname db --schema ./tests/schemes/valid_schema.yml -v --init-sql "set work_mem=\'1GB\'"',  # noqa
          Namespace(verbose=1, list_providers=False, schema='./tests/schemes/valid_schema.yml', dbname='db', user='root',
-                   password='my-cool-password', host='localhost', port='5432', dry_run=True, dump_file=None, init_sql="set work_mem='1GB'", parallel=False),  # noqa
+                   password='my-cool-password', host='localhost', port='5432', dry_run=True, dump_file=None, dump_options='--format custom --compress 9', init_sql="set work_mem='1GB'", parallel=False),  # noqa
          [call("set work_mem='1GB'"),
           call('TRUNCATE TABLE "django_session"'),
              call('SELECT "id", "first_name", "last_name", "email" FROM "auth_user" LIMIT 100'),
@@ -42,9 +42,9 @@ class TestCli(object):
           ],
             0, []
          ],
-        ['--dump-file ./dump.sql --host localhost --port 5432 --user root --password my-cool-password --dbname db --schema ./tests/schemes/valid_schema.yml -v --init-sql "set work_mem=\'1GB\'"',  # noqa
+        ['--dump-file ./dump.sql --dump-options "--format plain" --host localhost --port 5432 --user root --password my-cool-password --dbname db --schema ./tests/schemes/valid_schema.yml -v --init-sql "set work_mem=\'1GB\'"',  # noqa
          Namespace(verbose=1, list_providers=False, schema='./tests/schemes/valid_schema.yml', dbname='db', user='root',
-                   password='my-cool-password', host='localhost', port='5432', dry_run=False, dump_file='./dump.sql', init_sql="set work_mem='1GB'", parallel=False),  # noqa
+                   password='my-cool-password', host='localhost', port='5432', dry_run=False, dump_file='./dump.sql', dump_options='--format plain', init_sql="set work_mem='1GB'", parallel=False),  # noqa
          [
              call("set work_mem='1GB'"),
              call('TRUNCATE TABLE "django_session"'),
@@ -56,14 +56,14 @@ class TestCli(object):
              call('UPDATE "auth_user" t SET "first_name" = s."first_name", "last_name" = s."last_name", "email" = s."email" FROM "tmp_auth_user" s WHERE t."id" = s."id"')  # noqa
          ],
          1,
-         [call('PGPASSWORD=my-cool-password pg_dump -Fc -Z 9 -d db -U root -h localhost -p 5432 -f ./dump.sql', shell=True)]  # noqa
+         [call('PGPASSWORD=my-cool-password pg_dump --format plain --dbname db --username root --host localhost --port 5432 --file ./dump.sql', shell=True)]  # noqa
          ],
 
         ['--list-providers --parallel',
          Namespace(verbose=None, list_providers=True, schema='schema.yml', dbname=None, user=None,
-                   password='', host='localhost', port='5432', dry_run=False, dump_file=None, init_sql=False, parallel=True),  # noqa
+                   password='', host='localhost', port='5432', dry_run=False, dump_file=None, dump_options='--format custom --compress 9', init_sql=False, parallel=True),  # noqa
          [], 0, []
-         ]
+         ],
     ])
     def test_cli_args(self, subprocess, patched_connect, quote_ident, cli_args, expected, expected_executes, commit_calls, call_dump):  # noqa
         arg_parser = get_arg_parser()
